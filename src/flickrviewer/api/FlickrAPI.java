@@ -8,6 +8,10 @@ package flickrviewer.api;
 
 import java.io.*;
 import java.net.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -20,13 +24,12 @@ public class FlickrAPI {
     
     
     private String key;
-    
-    
+    private JSONParser jsonParser;
     
     private FlickrAPI(String key) {
         this.key = key;
         
-        
+        jsonParser = new JSONParser();
     }
     
     /**
@@ -47,7 +50,7 @@ public class FlickrAPI {
      * @return 
      */
     private String call(String method, String params) {
-        String urlString = "https://api.flickr.com/services/rest/?method=" + method + "&api_key=" + key + "&format=json";
+        String urlString = "https://api.flickr.com/services/rest/?method=" + method + "&api_key=" + key + "&format=json&nojsoncallback=1";
         if (params != null && !params.equals("")) urlString += "&" + params;
         
         System.out.println("Call " + urlString);
@@ -72,7 +75,22 @@ public class FlickrAPI {
             return responseBuilder.toString();
         } 
         catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
+            return null;
+        }
+    }
+    
+    /**
+     * Parsuje JSON text.
+     * @param response
+     * @return 
+     */
+    private Object jsonParse(String response) {
+        try {
+            return jsonParser.parse(response);
+        }
+        catch (ParseException e) {
+            e.printStackTrace(System.err);
             return null;
         }
     }
@@ -85,7 +103,7 @@ public class FlickrAPI {
      */
     public void getSets(String userId) {
         String response = call("flickr.photosets.getList", "user_id=" + userId);
-        System.out.println(response);
+        System.out.println(jsonParse(response));
     }
     
     
