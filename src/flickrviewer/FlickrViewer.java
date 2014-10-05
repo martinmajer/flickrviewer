@@ -30,7 +30,7 @@ public class FlickrViewer {
         boolean isCommandLine = false; // @todo
         
         if (!isCommandLine) {
-            //setNativeLookAndFeel();
+            setLookAndFeel();
             
             JFrame flickrFrame = new FlickrFrame();
             flickrFrame.setVisible(true);
@@ -38,9 +38,9 @@ public class FlickrViewer {
     }
     
     
-    private static void setNativeLookAndFeel() {
+    private static void setLookAndFeel() {
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
         } 
         catch(Exception e) {}
     }
