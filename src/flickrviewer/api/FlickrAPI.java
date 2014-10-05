@@ -56,7 +56,7 @@ public class FlickrAPI {
         String urlString = "https://api.flickr.com/services/rest/?method=" + method + "&api_key=" + key + "&format=json&nojsoncallback=1";
         if (params != null && !params.equals("")) urlString += "&" + params;
         
-        System.out.println("Call " + urlString);
+        System.out.println("FlickrAPI: " + urlString);
         
         try {
             URL url = new URL(urlString);
