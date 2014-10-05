@@ -8,6 +8,7 @@ package flickrviewer.gui;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.plaf.metal.*;
 
 /**
@@ -35,7 +36,7 @@ public class ComponentDecorator {
     public static JTextField decorateTextField(JTextField field) {
         field.setBackground(Color.WHITE);
         field.setForeground(Color.BLACK);
-        field.setBorder(BorderFactory.createEmptyBorder());
+        field.setBorder(new EmptyBorder(5, 5, 5, 5));
         field.setUI(new MyTextUI());
         
         field.setFont(FONT);
