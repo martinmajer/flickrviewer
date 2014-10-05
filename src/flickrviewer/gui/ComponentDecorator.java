@@ -16,6 +16,8 @@ import javax.swing.plaf.metal.*;
  */
 public class ComponentDecorator {
     
+    private static final Font FONT = new Font("Arial", Font.PLAIN, 14);
+    
     public static JPanel decoratePanel(JPanel panel) {
         panel.setBackground(Color.BLACK);
         return panel;
@@ -24,6 +26,8 @@ public class ComponentDecorator {
     public static JLabel decorateLabel(JLabel label) {
         label.setBackground(Color.BLACK);
         label.setForeground(Color.WHITE);
+        
+        label.setFont(FONT);
         
         return label;
     }
@@ -34,6 +38,8 @@ public class ComponentDecorator {
         field.setBorder(BorderFactory.createEmptyBorder());
         field.setUI(new MyTextUI());
         
+        field.setFont(FONT);
+        
         return field;
     }
     
@@ -42,6 +48,8 @@ public class ComponentDecorator {
         button.setForeground(Color.WHITE);
         button.setBorder(BorderFactory.createEmptyBorder());
         button.setUI(new MyButtonUI());
+        
+        button.setFont(FONT);
         
         return button;
     }
