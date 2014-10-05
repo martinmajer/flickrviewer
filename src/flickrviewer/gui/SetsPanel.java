@@ -8,6 +8,7 @@ package flickrviewer.gui;
 
 import flickrviewer.api.*;
 import java.util.List;
+import java.awt.GridBagLayout;
 
 import static flickrviewer.gui.ComponentDecorator.*;
 
@@ -21,6 +22,7 @@ public class SetsPanel extends FlickrPanel {
     
     public SetsPanel() {
         decoratePanel(this);
+        showPreloader();
         
         api = FlickrAPI.getInstance();
         

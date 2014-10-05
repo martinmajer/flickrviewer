@@ -8,6 +8,7 @@ package flickrviewer.gui;
 
 import flickrviewer.api.*;
 import java.awt.*;
+import java.net.URL;
 import javax.swing.*;
 
 /**
@@ -16,8 +17,11 @@ import javax.swing.*;
  */
 public abstract class FlickrPanel extends JPanel {
     
-    
+    /** Hlavní okno aplikace. */
     protected FlickrFrame flickrFrame;
+    
+    /** Animace načítání. */
+    private ImageIcon preloaderImage = null;
     
     
     public FlickrPanel() {
@@ -45,5 +49,24 @@ public abstract class FlickrPanel extends JPanel {
     public void disposePanel() {
         
     }
+    
+    protected void showPreloader() {
+        removeAll();
+        setLayout(new GridBagLayout());
+        add(createPreloader());
+    } 
+    
+    
+    /** Vytvoří animovaný preloader. */
+    protected JLabel createPreloader() {
+        if (preloaderImage == null) {
+            URL url = getClass().getClassLoader().getResource("res/preloader.gif");
+            preloaderImage = new ImageIcon(url);
+        }
+        JLabel label = new JLabel(preloaderImage);
+        label = ComponentDecorator.decorateLabel(label);
+        return label;
+    }
+    
     
 }
