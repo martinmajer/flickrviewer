@@ -9,6 +9,8 @@ package flickrviewer.gui;
 import flickrviewer.api.*;
 import java.util.List;
 
+import static flickrviewer.gui.ComponentDecorator.*;
+
 /**
  *
  * @author Martin
@@ -18,6 +20,8 @@ public class SetsPanel extends FlickrPanel {
     private FlickrAPI api;
     
     public SetsPanel() {
+        decoratePanel(this);
+        
         api = FlickrAPI.getInstance();
         
         /*List<PhotoSet> sets = api.getSets(flickrviewer.FlickrViewer.MY_USER_ID);

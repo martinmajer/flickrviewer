@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
+import static flickrviewer.gui.ComponentDecorator.*;
+
 /**
  *
  * @author Martin
@@ -22,17 +24,19 @@ public class UserSelectPanel extends FlickrPanel {
     public UserSelectPanel() {
         // setLayout(new FlowLayout(FlowLayout.CENTER));
         setLayout(new GridBagLayout());
+        decoratePanel(this);
         
         GridBagConstraints cnstrs = new GridBagConstraints();
         cnstrs.insets = new Insets(5, 5, 5, 5);
         
-        add(new JLabel("Select your username: "), cnstrs);
+        add(decorateLabel(new JLabel("Select your username: ")), cnstrs);
         
-        userName = new JTextField("");
-        userName.setColumns(20);
+        userName = decorateTextField(new JTextField(""));
+        userName.setPreferredSize(new Dimension(200, 30));
         add(userName, cnstrs);
         
-        JButton okButton = new JButton("OK");
+        JButton okButton = decorateButton(new JButton("OK"));
+        okButton.setPreferredSize(new Dimension(50, 30));
         add(okButton, cnstrs);
         
         okButton.addActionListener(new ActionListener() {

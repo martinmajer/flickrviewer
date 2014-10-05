@@ -7,6 +7,7 @@
 package flickrviewer;
 
 import flickrviewer.gui.*;
+import java.awt.Color;
 import javax.swing.*;
 
 /**
@@ -29,7 +30,7 @@ public class FlickrViewer {
         boolean isCommandLine = false; // @todo
         
         if (!isCommandLine) {
-            setNativeLookAndFeel();
+            //setNativeLookAndFeel();
             
             JFrame flickrFrame = new FlickrFrame();
             flickrFrame.setVisible(true);
