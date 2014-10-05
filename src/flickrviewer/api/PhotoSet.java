@@ -12,6 +12,13 @@ package flickrviewer.api;
  */
 public class PhotoSet {
     
+    /** ID alba. */
+    public long id;
     
+    /** Titulek alba. */
+    public String title;
+    
+    /** Popis alba. */
+    public String description;
     
 }
