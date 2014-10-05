@@ -56,6 +56,10 @@ public abstract class FlickrPanel extends JPanel {
         add(createPreloader());
     } 
     
+    protected void hidePreloader() {
+        removeAll();
+        setLayout(null);
+    }
     
     /** Vytvoří animovaný preloader. */
     protected JLabel createPreloader() {
