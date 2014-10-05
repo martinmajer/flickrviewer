@@ -7,6 +7,7 @@
 package flickrviewer.gui;
 
 import flickrviewer.api.*;
+import java.util.List;
 
 /**
  *
@@ -19,7 +20,8 @@ public class SetsPanel extends FlickrPanel {
     public SetsPanel() {
         api = FlickrAPI.getInstance();
         
-        api.getSets(flickrviewer.FlickrViewer.MY_USER_ID);
+        /*List<PhotoSet> sets = api.getSets(flickrviewer.FlickrViewer.MY_USER_ID);
+        System.out.println(sets);*/
     }
     
     
