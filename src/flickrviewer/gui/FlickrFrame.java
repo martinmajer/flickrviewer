@@ -46,6 +46,7 @@ public class FlickrFrame extends JFrame implements WindowListener {
         currentPanel.disposePanel();
         currentPanel = newPanel;
         
+        pack();
         repaint();
     }
     
