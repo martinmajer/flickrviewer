@@ -54,11 +54,13 @@ public abstract class FlickrPanel extends JPanel {
         removeAll();
         setLayout(new GridBagLayout());
         add(createPreloader());
+        repaint();
     } 
     
     protected void hidePreloader() {
         removeAll();
         setLayout(null);
+        repaint();
     }
     
     /** Vytvoří animovaný preloader. */
