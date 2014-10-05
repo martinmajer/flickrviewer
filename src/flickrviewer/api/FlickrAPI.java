@@ -8,8 +8,11 @@ package flickrviewer.api;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -87,10 +90,13 @@ public class FlickrAPI {
      */
     private Object jsonParse(String response) {
         try {
-            return jsonParser.parse(response);
+            Object result = jsonParser.parse(response);
+            jsonParser.reset();
+            return result;
         }
         catch (ParseException e) {
             e.printStackTrace(System.err);
+            jsonParser.reset();
             return null;
         }
     }
@@ -100,10 +106,29 @@ public class FlickrAPI {
      * 
      * https://www.flickr.com/services/api/flickr.photosets.getList.html
      * @param userId ID uživatele
+     * @return 
      */
-    public void getSets(String userId) {
+    public List<PhotoSet> getSets(String userId) {
         String response = call("flickr.photosets.getList", "user_id=" + userId);
-        System.out.println(jsonParse(response));
+        JSONObject json = (JSONObject)jsonParse(response);
+        if (json == null) return null;
+        
+        JSONArray photosets = (JSONArray)((JSONObject)json.get("photosets")).get("photoset");
+        
+        List<PhotoSet> sets = new ArrayList();
+        
+        for (int i = 0; i < photosets.size(); i++) {
+            JSONObject photoset = (JSONObject)photosets.get(new Integer(i));
+            
+            PhotoSet set = new PhotoSet();
+            set.id = Long.parseLong(photoset.get("id").toString());
+            set.title = ((JSONObject)photoset.get("title")).get("_content").toString();
+            set.description = ((JSONObject)photoset.get("title")).get("_content").toString();
+            
+            sets.add(set);
+        }
+        
+        return sets;
     }
     
     
