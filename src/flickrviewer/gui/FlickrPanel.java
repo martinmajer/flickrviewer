@@ -12,7 +12,7 @@ import java.net.URL;
 import javax.swing.*;
 
 /**
- *
+ * Panel programu zobrazený v hlavním okně.
  * @author Martin
  */
 public abstract class FlickrPanel extends JPanel {

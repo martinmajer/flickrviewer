@@ -12,7 +12,7 @@ import javax.swing.border.*;
 import javax.swing.plaf.metal.*;
 
 /**
- *
+ * Třída pro jednoduché nastavení vzhledu Swing komponent (metal look & feel).
  * @author Martin
  */
 public class ComponentDecorator {

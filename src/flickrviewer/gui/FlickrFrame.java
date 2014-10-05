@@ -11,7 +11,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
- *
+ * Hlavní okno programu.
  * @author Martin
  */
 public class FlickrFrame extends JFrame implements WindowListener {

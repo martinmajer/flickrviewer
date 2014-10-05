@@ -14,7 +14,7 @@ import javax.swing.*;
 import static flickrviewer.gui.ComponentDecorator.*;
 
 /**
- *
+ * Panel pro výběr uživatele.
  * @author Martin
  */
 public class UserSelectPanel extends FlickrPanel {

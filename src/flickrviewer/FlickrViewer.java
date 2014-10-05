@@ -11,7 +11,7 @@ import java.awt.Color;
 import javax.swing.*;
 
 /**
- *
+ * Hlavní třída programu.
  * @author Martin
  */
 public class FlickrViewer {

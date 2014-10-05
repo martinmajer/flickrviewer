@@ -17,7 +17,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- *
+ * Třída zajišťující práci s Flickr API.
  * @author Martin
  */
 public class FlickrAPI {

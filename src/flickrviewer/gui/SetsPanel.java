@@ -13,7 +13,7 @@ import java.awt.GridBagLayout;
 import static flickrviewer.gui.ComponentDecorator.*;
 
 /**
- *
+ * Panel s přehledem alb.
  * @author Martin
  */
 public class SetsPanel extends FlickrPanel {

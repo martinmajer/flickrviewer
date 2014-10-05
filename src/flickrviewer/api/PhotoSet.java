@@ -7,7 +7,7 @@
 package flickrviewer.api;
 
 /**
- *
+ * Album (set) na Flickru.
  * @author Martin
  */
 public class PhotoSet {
