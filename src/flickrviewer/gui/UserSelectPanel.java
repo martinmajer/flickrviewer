@@ -6,12 +6,14 @@
 
 package flickrviewer.gui;
 
+import flickrviewer.FlickrViewer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import static flickrviewer.gui.ComponentDecorator.*;
+import flickrviewer.util.FileUtils;
 
 /**
  * Panel pro výběr uživatele.
@@ -31,7 +33,9 @@ public class UserSelectPanel extends FlickrPanel {
         
         add(decorateLabel(new JLabel("Select your username: ")), cnstrs);
         
-        userName = decorateTextField(new JTextField(""));
+        String lastUserNameValue = FileUtils.readString(FlickrViewer.getDataDirectory() + "/username");
+        
+        userName = decorateTextField(new JTextField(lastUserNameValue));
         userName.setPreferredSize(new Dimension(200, 30));
         add(userName, cnstrs);
         
@@ -50,7 +54,9 @@ public class UserSelectPanel extends FlickrPanel {
     private void okButtonClicked() {
         String flickrUsername = userName.getText();
         
-        FlickrPanel newPanel = new SetsPanel();
+        FileUtils.writeString(FlickrViewer.getDataDirectory() + "/username", flickrUsername);
+        
+        FlickrPanel newPanel = new SetsPanel(flickrUsername);
         flickrFrame.changePanel(newPanel);
     }
     

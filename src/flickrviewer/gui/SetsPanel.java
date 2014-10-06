@@ -27,9 +27,13 @@ import java.awt.event.ComponentListener;
  */
 public class SetsPanel extends FlickrPanel {
     
+    private String username;
+    
     private List<PhotoSet> sets;
     
-    public SetsPanel() {
+    public SetsPanel(String username) {
+        this.username = username;
+        
         decoratePanel(this);
         showPreloader();
         
