@@ -62,6 +62,7 @@ public abstract class FlickrPanel extends JPanel {
         removeAll();
         setLayout(new GridBagLayout());
         add(createPreloader());
+        revalidate();
         repaint();
     } 
     
