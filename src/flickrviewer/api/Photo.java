@@ -6,6 +6,8 @@
 
 package flickrviewer.api;
 
+import java.awt.Image;
+
 /**
  * Fotka na Flickr.
  * @author Martin
@@ -22,10 +24,14 @@ public class Photo {
     public String description;
     
     /** Malá velikost. */
-    public String smallUrl;
+    public String mediumUrl;
     
     /** Originální velikost. */
     public String originalUrl;
+    
+    
+    
+    public transient Image medium;
     
     
 }
