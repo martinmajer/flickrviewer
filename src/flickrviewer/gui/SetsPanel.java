@@ -119,7 +119,7 @@ public class SetsPanel extends FlickrPanel {
             innerPanel.add(button);
             buttons.add(button);
             
-            AsyncLoader.getInstance().load(new LoadSetCover(set, button));
+            // AsyncLoader.getInstance().load(new LoadSetCover(set, button));
         }
         
         innerPanel.addMouseListener(flickrFrame);
