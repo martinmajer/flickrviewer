@@ -7,9 +7,12 @@
 package flickrviewer.gui;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.plaf.metal.*;
+import javax.swing.text.StyleConstants;
 
 /**
  * Třída pro jednoduché nastavení vzhledu Swing komponent (metal look & feel).
@@ -18,6 +21,10 @@ import javax.swing.plaf.metal.*;
 public class ComponentDecorator {
     
     private static final Font FONT = new Font("Arial", Font.PLAIN, 14);
+    
+    
+    private static final Color COLOR_BUTTON_HOVER = new Color(96, 96, 96);
+    
     
     public static JPanel decoratePanel(JPanel panel) {
         panel.setBackground(Color.BLACK);
@@ -44,13 +51,42 @@ public class ComponentDecorator {
         return field;
     }
     
-    public static JButton decorateButton(JButton button) {
+    public static JButton decorateButton(final JButton button) {
         button.setBackground(Color.DARK_GRAY);
         button.setForeground(Color.WHITE);
         button.setBorder(BorderFactory.createEmptyBorder());
         button.setUI(new MyButtonUI());
         
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         button.setFont(FONT);
+        
+        button.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(COLOR_BUTTON_HOVER);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(Color.DARK_GRAY);
+            }
+        });
         
         return button;
     }
@@ -77,6 +113,12 @@ public class ComponentDecorator {
         @Override
         protected Color getFocusColor() {
             return Color.GRAY;
+        }
+        
+        @Override
+        protected void paintFocus(Graphics g, AbstractButton b,
+                              Rectangle viewRect, Rectangle textRect, Rectangle iconRect){ 
+            
         }
         
     }
