@@ -28,4 +28,13 @@ public interface AsyncJob {
      */
     public void done(Object data, FlickrException ex);
     
+    
+    /** Rozhraní pro definici priority. */
+    public interface Priority {
+        
+        public int getPriority();
+        
+    }
+    
+    
 }

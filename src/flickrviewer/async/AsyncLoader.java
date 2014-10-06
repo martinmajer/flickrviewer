@@ -22,14 +22,14 @@ public class AsyncLoader implements Runnable {
     private Thread loaderThread;
     private final Object lock;
     
-    private Queue<AsyncJob> queue;
+    private PriorityQueue<AsyncJobInternal> queue;
     
     private AsyncLoader() {
         loaderThread = new Thread(this);
         loaderThread.setDaemon(true);
         
         lock = new Object();
-        queue = new LinkedList();
+        queue = new PriorityQueue<>(10, new AsyncJobComparator());
     }
     
     /**
@@ -51,7 +51,7 @@ public class AsyncLoader implements Runnable {
                 catch (InterruptedException ex) {}
             }
             
-            queue.add(job);
+            queue.add(new AsyncJobInternal(job));
             System.out.println("AsyncLoader: Added job " + job + " (" + Thread.currentThread().getName() + ")");
             lock.notifyAll();
         }
@@ -75,7 +75,7 @@ public class AsyncLoader implements Runnable {
                 }
             }
             
-            AsyncJob nextJob = queue.poll();
+            AsyncJob nextJob = queue.poll().job;
             System.out.println("AsyncLoader: Retrieved job " + nextJob);
             
             try {
@@ -86,6 +86,46 @@ public class AsyncLoader implements Runnable {
                 nextJob.done(null, ex);
             }
         }
+    }
+    
+    
+    
+    private static class AsyncJobInternal {
+        
+        private static int currentId = 0;
+        
+        public AsyncJob job;
+        public int id;
+        
+        public AsyncJobInternal(AsyncJob job) {
+            this.job = job;
+            id = ++currentId;
+        }
+        
+    }
+    
+    
+    private static class AsyncJobComparator implements Comparator<AsyncJobInternal> {
+
+        @Override
+        public int compare(AsyncJobInternal a, AsyncJobInternal b) {
+            int priorityA = 0, priorityB = 0;
+            if (a.job instanceof AsyncJob.Priority) {
+                priorityA = ((AsyncJob.Priority)a.job).getPriority();
+            }
+            if (b.job instanceof AsyncJob.Priority) {
+                priorityB = ((AsyncJob.Priority)b.job).getPriority();
+            }
+            
+            if (priorityA > priorityB) return -1;
+            else if (priorityA < priorityB) return 1;
+            else {
+                if (a.id < b.id) return -1;
+                else if (a.id > b.id) return 1;
+                else return 0;
+            }
+        }
+        
     }
     
     
