@@ -16,9 +16,6 @@ import javax.swing.*;
  * @author Martin
  */
 public class FlickrViewer {
-
-    /** Defaultní ID uživatele. */
-    public static final String MY_USER_ID = "24890203@N06";
     
     /** API klíč. */
     public static final String API_KEY = "156f279670a45dc11dfbd1d6c7486256";

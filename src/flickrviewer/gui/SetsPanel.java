@@ -28,6 +28,7 @@ import java.awt.event.ComponentListener;
 public class SetsPanel extends FlickrPanel {
     
     private String username;
+    private String userId;
     
     private List<PhotoSet> sets;
     
@@ -37,19 +38,41 @@ public class SetsPanel extends FlickrPanel {
         decoratePanel(this);
         showPreloader();
         
-        AsyncLoader.getInstance().load(new AsyncJob() {
-            @Override
-            public Object loadData() throws FlickrException {
-                return FlickrAPI.getInstance().getSets(flickrviewer.FlickrViewer.MY_USER_ID);
-            }
+        AsyncLoader.getInstance().load(new LoadUserId());
+    }
+    
+    
+    private class LoadUserId implements AsyncJob {
+        @Override
+        public Object loadData() throws FlickrException {
+            return FlickrAPI.getInstance().getUserId(username);
+        }
 
-            @Override
-            public void done(Object data, FlickrException ex) {
-                hidePreloader();
-                sets = (List<PhotoSet>)data;
-                showSets();
+        @Override
+        public void done(Object data, FlickrException ex) {
+            if (data != null) {
+                userId = (String)data;
+                AsyncLoader.getInstance().load(new LoadSets());
             }
-        });
+            else {
+                FlickrPanel newPanel = new UserSelectPanel();
+                flickrFrame.changePanel(newPanel);
+            }
+        }
+    }
+    
+    private class LoadSets implements AsyncJob {
+        @Override
+        public Object loadData() throws FlickrException {
+            return FlickrAPI.getInstance().getSets(userId);
+        }
+
+        @Override
+        public void done(Object data, FlickrException ex) {
+            hidePreloader();
+            sets = (List<PhotoSet>)data;
+            showSets();
+        }
     }
     
     
