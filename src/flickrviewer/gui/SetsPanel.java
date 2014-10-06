@@ -10,22 +10,24 @@ import flickrviewer.api.*;
 import flickrviewer.async.AsyncJob;
 import flickrviewer.async.AsyncLoader;
 import java.util.List;
-import java.awt.GridBagLayout;
 import javax.swing.*;
+import java.awt.*;
+import java.net.URL;
+import java.awt.event.*;
+import java.net.MalformedURLException;
 
 import static flickrviewer.gui.ComponentDecorator.*;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 
 /**
  * Panel s přehledem alb.
  * @author Martin
  */
 public class SetsPanel extends FlickrPanel {
+    
+    
+    private static final int SET_BUTTON_WIDTH = 150;
+    private static final int SET_BUTTON_HEIGHT = 150;
+    
     
     private String username;
     private String userId;
@@ -75,6 +77,36 @@ public class SetsPanel extends FlickrPanel {
         }
     }
     
+    private class LoadSetCover implements AsyncJob {
+
+        private PhotoSet set;
+        private JButton setButton;
+        
+        public LoadSetCover(PhotoSet set, JButton setButton) {
+            this.set = set;
+            this.setButton = setButton;
+        }
+        
+        @Override
+        public Object loadData() throws FlickrException {
+            try {
+                ImageIcon icon = new ImageIcon(new URL(set.coverUrl));
+                return icon;
+            } catch (MalformedURLException ex) {
+                return null;
+            }
+        }
+
+        @Override
+        public void done(Object data, FlickrException ex) {
+            if (data != null) {
+                setButton.setText(null);
+                setButton.setIcon((ImageIcon)data);
+            }
+        }
+        
+    }
+    
     
     private void showSets() {
         final JPanel innerPanel = decoratePanel(new JPanel());
@@ -82,7 +114,10 @@ public class SetsPanel extends FlickrPanel {
         innerPanel.setLayout(new SetsLayout());
         
         for (PhotoSet set: sets) {
-            innerPanel.add(createSetComponent(set));
+            JButton button = createSetButton(set);
+            innerPanel.add(button);
+            
+            AsyncLoader.getInstance().load(new LoadSetCover(set, button));
         }
         
         innerPanel.addMouseListener(flickrFrame);
@@ -117,9 +152,11 @@ public class SetsPanel extends FlickrPanel {
         repaint();
     }
     
-    private JComponent createSetComponent(PhotoSet set) {
-        JButton setButton = decorateButton(new JButton(set.title));
-        setButton.setPreferredSize(new Dimension(128, 128));
+    private JButton createSetButton(PhotoSet set) {
+        JButton setButton = decorateSetButton(new JButton(set.title));
+        setButton.setVerticalTextPosition(SwingConstants.CENTER);
+        setButton.setHorizontalTextPosition(SwingConstants.CENTER);
+        setButton.setPreferredSize(new Dimension(SET_BUTTON_WIDTH, SET_BUTTON_HEIGHT));
         
         return setButton;
     }

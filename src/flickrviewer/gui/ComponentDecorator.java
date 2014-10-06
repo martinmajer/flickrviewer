@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.plaf.metal.*;
 import javax.swing.text.StyleConstants;
+import sun.swing.SwingUtilities2;
 
 /**
  * Třída pro jednoduché nastavení vzhledu Swing komponent (metal look & feel).
@@ -20,7 +21,8 @@ import javax.swing.text.StyleConstants;
  */
 public class ComponentDecorator {
     
-    private static final Font FONT = new Font("Arial", Font.PLAIN, 14);
+    public static final Font FONT = new Font("Arial", Font.PLAIN, 14);
+    // public static final Font FONT_SETS = new Font("Arial", Font.PLAIN, 15);
     
     
     private static final Color COLOR_BUTTON_HOVER = new Color(96, 96, 96);
@@ -91,6 +93,51 @@ public class ComponentDecorator {
         return button;
     }
     
+    public static JButton decorateSetButton(final JButton button) {
+        button.setBackground(Color.DARK_GRAY);
+        button.setForeground(Color.WHITE);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setUI(new MySetButtonUI());
+        
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.setFont(FONT);
+        
+        final String text = button.getText();
+        // final Icon icon = button.getIcon();
+        
+        button.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(COLOR_BUTTON_HOVER);
+                button.setText(text);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(Color.DARK_GRAY);
+                button.setText(null);
+            }
+        });
+        
+        return button;
+    }
+    
     public static JScrollBar decorateScrollBar(JScrollBar scrollBar) {
         scrollBar.setUnitIncrement(16);
         scrollBar.setUI(new MyScrollBarUI());
@@ -119,6 +166,32 @@ public class ComponentDecorator {
         protected void paintFocus(Graphics g, AbstractButton b,
                               Rectangle viewRect, Rectangle textRect, Rectangle iconRect){ 
             
+        }
+        
+    }
+    
+    public static class MySetButtonUI extends MyButtonUI {
+        
+        @Override
+        protected void paintText(Graphics g, JComponent c, Rectangle r, String text) {
+            AbstractButton b = (AbstractButton) c;
+            
+            /*Color foreground = b.getForeground();
+            b.setForeground(new Color(0, 0, 0));
+            super.paintText(g, c, new Rectangle(r.x + 1, r.y + 1, r.width, r.height), text);
+            super.paintText(g, c, new Rectangle(r.x + 1, r.y - 1, r.width, r.height), text);
+            super.paintText(g, c, new Rectangle(r.x - 1, r.y + 1, r.width, r.height), text);
+            super.paintText(g, c, new Rectangle(r.x - 1, r.y - 1, r.width, r.height), text);
+            super.paintText(g, c, new Rectangle(r.x, r.y + 1, r.width, r.height), text);
+            super.paintText(g, c, new Rectangle(r.x, r.y - 1, r.width, r.height), text);
+            super.paintText(g, c, new Rectangle(r.x + 1, r.y, r.width, r.height), text);
+            super.paintText(g, c, new Rectangle(r.x - 1, r.y + 1, r.width, r.height), text);
+            b.setForeground(foreground);*/
+            if (b.getIcon() != null) {
+                g.setColor(new Color(0, 0, 0, 192));
+                g.fillRect(r.x - 100, r.y - 5, r.width + 200, r.height + 10);
+            }
+            super.paintText(g, c, r, text);
         }
         
     }
