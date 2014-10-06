@@ -50,6 +50,14 @@ public abstract class FlickrPanel extends JPanel {
         
     }
     
+    /** 
+     * Událost při stisku klávesy escape.
+     * @return pokud vrátí false, bude ukončen program
+     */
+    public boolean escapeAction() {
+        return false;
+    }
+    
     protected void showPreloader() {
         removeAll();
         setLayout(new GridBagLayout());

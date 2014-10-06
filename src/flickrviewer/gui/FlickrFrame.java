@@ -36,6 +36,13 @@ public class FlickrFrame extends JFrame implements WindowListener {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         
         addWindowListener(this);
+        // addKeyListener(this);
+        getRootPane().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                escapeAction();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
     
     
@@ -49,6 +56,15 @@ public class FlickrFrame extends JFrame implements WindowListener {
         
         pack();
         repaint();
+    }
+    
+    
+    
+    private void escapeAction() {
+        if (!currentPanel.escapeAction()) {
+            currentPanel.disposePanel();
+            dispose();
+        }
     }
     
     
