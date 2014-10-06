@@ -15,8 +15,16 @@ import static flickrviewer.gui.ComponentDecorator.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.*;
+import org.imgscalr.Scalr;
+import org.imgscalr.Scalr;
 
 /**
  * Panel pro prohlížení fotek.
@@ -169,7 +177,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         
         @Override
         public Object loadData() throws FlickrException {
-            photo.image = PhotoDownloader.download(photo.largeUrl);
+            photo.image = PhotoDownloader.download(photo.originalUrl);
             return true;
         }
 
@@ -201,19 +209,21 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
     private void showImagePanel(Image image) {
         setLayout(new BorderLayout());
         ImagePanel panel = new ImagePanel();
-        panel.image = image;
+        panel.image = (BufferedImage)image;
         add(panel);
         revalidate();
         repaint();
     }
     
     
-    private class ImagePanel extends JPanel {
+    private static class ImagePanel extends JPanel {
         
-        public Image image;
+        public BufferedImage image;
+        private static Map<BufferedImage, BufferedImage> scaledImages = new ConcurrentHashMap<BufferedImage, BufferedImage>();
         
+        @Override
         public void paint(Graphics g) {
-            Graphics g2 = (Graphics2D)g;
+            Graphics2D g2 = (Graphics2D)g;
             
             int imageWidth = image.getWidth(null);
             int imageHeight = image.getHeight(null);
@@ -221,8 +231,8 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             int thisWidth = getWidth();
             int thisHeight = getHeight();
             
-            int renderedWidth = 0;
-            int renderedHeight = 0;
+            final int renderedWidth;
+            final int renderedHeight;
             
             float imageRatio = (float)imageWidth / (float)imageHeight;
             float thisRatio = (float)thisWidth / (float)thisHeight;
@@ -246,7 +256,22 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, thisWidth, thisHeight);
             
-            g.drawImage(this.image, left, top, renderedWidth, renderedHeight, null);
+            // g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            
+            if (scaledImages.get(image) == null || scaledImages.get(image).getWidth(null) != renderedWidth || scaledImages.get(image).getHeight(null) != renderedHeight) {
+                scaledImages.remove(image);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        BufferedImage scaled = Scalr.resize((BufferedImage)image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, renderedWidth, renderedHeight);
+                        scaledImages.put(image, scaled);
+                        repaint();
+                    }
+                }).start();
+            }
+            
+            if (scaledImages.get(image) != null) g.drawImage(scaledImages.get(image), left, top, null);
+            else g.drawImage(this.image, left, top, renderedWidth, renderedHeight, null);
         }
         
     }
