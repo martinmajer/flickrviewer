@@ -42,6 +42,7 @@ public class FlickrFrame extends JFrame implements WindowListener {
     public void changePanel(FlickrPanel newPanel) {
         getContentPane().remove(currentPanel);
         newPanel.initPanel();
+        newPanel.setFlickrFrame(this);
         getContentPane().add(newPanel);
         currentPanel.disposePanel();
         currentPanel = newPanel;
