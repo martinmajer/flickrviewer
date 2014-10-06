@@ -55,6 +55,12 @@ public class ComponentDecorator {
         return button;
     }
     
+    public static JScrollBar decorateScrollBar(JScrollBar scrollBar) {
+        scrollBar.setUnitIncrement(16);
+        scrollBar.setUI(new MyScrollBarUI());
+        return scrollBar;
+    }
+    
     
     public static class MyTextUI extends MetalTextFieldUI {
         
@@ -71,6 +77,40 @@ public class ComponentDecorator {
         @Override
         protected Color getFocusColor() {
             return Color.GRAY;
+        }
+        
+    }
+    
+    public static class MyScrollBarUI extends MetalScrollBarUI {
+        
+        protected JButton createDecreaseButton( int orientation )
+        {
+            // return super.createDecreaseButton(orientation);
+            return createZeroButton();
+        }
+
+        
+        protected JButton createIncreaseButton( int orientation )
+        {
+            return createZeroButton();
+        }
+        
+        private JButton createZeroButton() {
+            JButton jbutton = new JButton();
+            jbutton.setPreferredSize(new Dimension(0, 0));
+            jbutton.setMinimumSize(new Dimension(0, 0));
+            jbutton.setMaximumSize(new Dimension(0, 0));
+            return jbutton;
+        }
+        
+        protected void paintTrack( Graphics g, JComponent c, Rectangle trackBounds ) {
+            g.setColor(Color.BLACK);
+            g.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+        }
+        
+        protected void paintThumb( Graphics g, JComponent c, Rectangle thumbBounds ) {
+            g.setColor(Color.DARK_GRAY);
+            g.fillRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height);
         }
         
     }

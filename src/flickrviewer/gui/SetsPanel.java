@@ -61,6 +61,7 @@ public class SetsPanel extends FlickrPanel {
         setLayout(new BorderLayout(0, 0));
         final JScrollPane scrollPane = new JScrollPane(innerPanel);
         scrollPane.setBorder(null);
+        decorateScrollBar(scrollPane.getVerticalScrollBar());
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         
         scrollPane.addComponentListener(new ComponentListener() {
