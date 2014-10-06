@@ -8,6 +8,7 @@ package flickrviewer;
 
 import flickrviewer.gui.*;
 import java.awt.Color;
+import java.io.File;
 import javax.swing.*;
 
 /**
@@ -29,6 +30,8 @@ public class FlickrViewer {
     public static void main(String[] args) {
         boolean isCommandLine = false; // @todo
         
+        initAppDir();
+        
         if (!isCommandLine) {
             setLookAndFeel();
             
@@ -37,6 +40,19 @@ public class FlickrViewer {
         }
     }
     
+    public static String getDataDirectory() {
+        return System.getProperty("user.home")  + "/.flickrviewer";
+    }
+    
+    private static void initAppDir() {
+        String appDirPath = getDataDirectory();
+        System.out.println("FlickrViewer: application data " + appDirPath);
+        File appDir = new File(appDirPath);
+        if (!appDir.exists() || appDir.isFile()) {
+            if (appDir.isFile()) appDir.delete();
+            appDir.mkdir();
+        }
+    }
     
     private static void setLookAndFeel() {
         try {
