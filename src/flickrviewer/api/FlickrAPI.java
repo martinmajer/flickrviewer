@@ -191,7 +191,7 @@ public class FlickrAPI {
                 Photo photo = new Photo();
                 photo.id = Long.parseLong(photoJson.get("id").toString());
                 photo.title = (String)photoJson.get("title");
-                photo.mediumUrl = (String)photoJson.get("url_l");
+                photo.largeUrl = (String)photoJson.get("url_l");
                 photo.originalUrl = (String)photoJson.get("url_o");
                 
                 photos.add(photo);

@@ -6,6 +6,7 @@
 
 package flickrviewer.api;
 
+import flickrviewer.async.AsyncJob;
 import java.awt.Image;
 
 /**
@@ -24,14 +25,14 @@ public class Photo {
     public String description;
     
     /** Malá velikost. */
-    public String mediumUrl;
+    public String largeUrl;
     
     /** Originální velikost. */
     public String originalUrl;
     
     
     
-    public transient Image medium;
-    
+    public transient volatile Image image;
+    public transient volatile AsyncJob loadingJob;
     
 }
