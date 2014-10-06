@@ -46,6 +46,13 @@ public class FlickrAPI {
         return instance;
     }
     
+    private String urlEncode(String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        }
+        catch (UnsupportedEncodingException ex) { return ""; }
+    }
+    
     /**
      * Zavolá metodu z Flickr API
      * @param method jméno metody
@@ -101,6 +108,28 @@ public class FlickrAPI {
         }
     }
     
+    
+    /**
+     * Vrátí ID uživatele podle uživatelského jména.
+     * 
+     * https://www.flickr.com/services/api/flickr.people.findByUsername.html
+     * @param username
+     * @return 
+     */
+    public String getUserId(String username) {
+        String response = call("flickr.people.findByUsername", "username=" + urlEncode(username));
+        System.out.println(response);
+        JSONObject json = (JSONObject)jsonParse(response);
+        String stat = (String)json.get("stat");
+        
+        if ("ok".equals(stat)) {
+            return (String)((JSONObject)json.get("user")).get("id");
+        }
+        
+        return null;
+    }
+    
+    
     /**
      * Vrátí seznam alb zadaného uživatele.
      * 
@@ -109,7 +138,7 @@ public class FlickrAPI {
      * @return 
      */
     public List<PhotoSet> getSets(String userId) {
-        String response = call("flickr.photosets.getList", "user_id=" + userId);
+        String response = call("flickr.photosets.getList", "user_id=" + urlEncode(userId));
         JSONObject json = (JSONObject)jsonParse(response);
         if (json == null) return null;
         
