@@ -162,4 +162,46 @@ public class FlickrAPI {
     }
     
     
+    /**
+     * Vrátí seznam fotek z daného alba.
+     * 
+     * https://www.flickr.com/services/api/flickr.photosets.getPhotos.html
+     * @param set
+     * @return 
+     */
+    public List<Photo> getPhotos(PhotoSet set) {
+        int perPage = 10;
+        int total = -1;
+        int page = 1;
+        
+        List<Photo> photos = new ArrayList();
+        
+        while (total == -1 || (page - 1) * perPage < total) {
+            String response = call("flickr.photosets.getPhotos", "photoset_id=" + set.id + "&media=photos&extras=url_s,url_o&per_page=" + perPage + "&page=" + page);
+            JSONObject json = (JSONObject)jsonParse(response);
+            if (json == null) return null;
+
+            if (total == -1) total = Integer.parseInt((String)((JSONObject)json.get("photoset")).get("total"));
+            
+            JSONArray photosJson = (JSONArray)((JSONObject)json.get("photoset")).get("photo");
+            
+            for (int i = 0; i < photosJson.size(); i++) {
+                JSONObject photoJson = (JSONObject)photosJson.get(new Integer(i));
+                
+                Photo photo = new Photo();
+                photo.id = Long.parseLong(photoJson.get("id").toString());
+                photo.title = (String)photoJson.get("title");
+                photo.smallUrl = (String)photoJson.get("url_s");
+                photo.originalUrl = (String)photoJson.get("url_o");
+                
+                photos.add(photo);
+            }
+            
+            page++;
+        }
+        
+        return photos;
+    }
+    
+    
 }
