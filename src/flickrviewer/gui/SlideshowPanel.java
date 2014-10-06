@@ -6,22 +6,17 @@
 
 package flickrviewer.gui;
 
-import flickrviewer.api.FlickrAPI;
-import flickrviewer.api.FlickrException;
-import flickrviewer.api.Photo;
-import flickrviewer.api.PhotoSet;
-import flickrviewer.async.AsyncJob;
-import flickrviewer.async.AsyncLoader;
-import static flickrviewer.gui.ComponentDecorator.*;
+import flickrviewer.api.*;
+import flickrviewer.async.*;
 import flickrviewer.util.PhotoDownloader;
-import java.awt.GridBagLayout;
+
+import static flickrviewer.gui.ComponentDecorator.*;
+
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.swing.*;
 
 /**
  * Panel pro prohlížení fotek.
@@ -136,12 +131,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         }
         else {
             hidePreloader();
-            JLabel photoLabel = new JLabel(new ImageIcon(photo.image));
-            setLayout(new GridBagLayout());
-            add(photoLabel);
-            
-            revalidate();
-            repaint();
+            showImagePanel(photo.image);
             
             currentIndex = index;
             
@@ -159,6 +149,8 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             
         }
     }
+    
+    
     
     private class LoadPhoto implements AsyncJob, AsyncJob.Priority {
 
@@ -203,5 +195,61 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         }
         else return false;
     }
+    
+    
+    
+    private void showImagePanel(Image image) {
+        setLayout(new BorderLayout());
+        ImagePanel panel = new ImagePanel();
+        panel.image = image;
+        add(panel);
+        revalidate();
+        repaint();
+    }
+    
+    
+    private class ImagePanel extends JPanel {
+        
+        public Image image;
+        
+        public void paint(Graphics g) {
+            Graphics g2 = (Graphics2D)g;
+            
+            int imageWidth = image.getWidth(null);
+            int imageHeight = image.getHeight(null);
+            
+            int thisWidth = getWidth();
+            int thisHeight = getHeight();
+            
+            int renderedWidth = 0;
+            int renderedHeight = 0;
+            
+            float imageRatio = (float)imageWidth / (float)imageHeight;
+            float thisRatio = (float)thisWidth / (float)thisHeight;
+            
+            if (imageRatio > thisRatio) {
+                renderedWidth = thisWidth;
+                renderedHeight = (int)(thisWidth / imageRatio);
+            }
+            else if (imageRatio < thisRatio) {
+                renderedHeight = thisHeight;
+                renderedWidth = (int)(thisHeight * imageRatio);
+            }
+            else {
+                renderedWidth = thisWidth;
+                renderedHeight = thisHeight;
+            }
+            
+            int left = (thisWidth - renderedWidth) / 2;
+            int top = (thisHeight - renderedHeight) / 2;
+            
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, thisWidth, thisHeight);
+            
+            g.drawImage(this.image, left, top, renderedWidth, renderedHeight, null);
+        }
+        
+    }
+    
     
 }
