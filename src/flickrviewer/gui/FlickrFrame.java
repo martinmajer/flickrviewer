@@ -70,6 +70,7 @@ public class FlickrFrame extends JFrame implements WindowListener, MouseListener
         if (!currentPanel.escapeAction()) {
             currentPanel.disposePanel();
             dispose();
+            System.exit(0);
         }
     }
     
@@ -84,6 +85,7 @@ public class FlickrFrame extends JFrame implements WindowListener, MouseListener
     public void windowClosing(WindowEvent e) {
         currentPanel.disposePanel();
         dispose();
+        System.exit(0);
     }
 
     @Override
