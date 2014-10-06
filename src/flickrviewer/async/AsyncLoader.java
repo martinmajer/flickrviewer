@@ -69,8 +69,10 @@ public class AsyncLoader implements Runnable {
         
         while (true) {
             synchronized (lock) {
-                try { lock.wait(); } 
-                catch (InterruptedException ex) {}
+                while (queue.isEmpty()) {
+                    try { lock.wait(); } 
+                    catch (InterruptedException ex) {}
+                }
             }
             
             AsyncJob nextJob = queue.poll();
