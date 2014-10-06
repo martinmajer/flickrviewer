@@ -170,7 +170,7 @@ public class FlickrAPI {
      * @return 
      */
     public List<Photo> getPhotos(PhotoSet set) {
-        int perPage = 10;
+        int perPage = 100;
         int total = -1;
         int page = 1;
         
