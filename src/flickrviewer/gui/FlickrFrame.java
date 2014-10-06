@@ -14,10 +14,13 @@ import javax.swing.*;
  * Hlavní okno programu.
  * @author Martin
  */
-public class FlickrFrame extends JFrame implements WindowListener {
+public class FlickrFrame extends JFrame implements WindowListener, MouseListener {
     
     /** Aktuální panel. */
     private FlickrPanel currentPanel;
+    
+    /** Fullscreen? */
+    private boolean isFullscreen = false;
     
     public FlickrFrame() {
         setTitle("Flickr Viewer");
@@ -25,6 +28,7 @@ public class FlickrFrame extends JFrame implements WindowListener {
         currentPanel = new UserSelectPanel();
         currentPanel.setFlickrFrame(this);
         currentPanel.initPanel();
+        currentPanel.addMouseListener(this);
         
         getContentPane().setLayout(new BorderLayout(0, 0));
         getContentPane().add(currentPanel);
@@ -50,6 +54,8 @@ public class FlickrFrame extends JFrame implements WindowListener {
         getContentPane().remove(currentPanel);
         newPanel.initPanel();
         newPanel.setFlickrFrame(this);
+        newPanel.addMouseListener(this);
+        getContentPane().setPreferredSize(getContentPane().getSize());
         getContentPane().add(newPanel);
         currentPanel.disposePanel();
         currentPanel = newPanel;
@@ -102,6 +108,48 @@ public class FlickrFrame extends JFrame implements WindowListener {
 
     @Override
     public void windowDeactivated(WindowEvent e) {
+        
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (e.getClickCount() == 2 && !e.isConsumed()) {
+            e.consume();
+            
+            GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            if (!isFullscreen) {
+                dispose();
+                setUndecorated(true);
+                device.setFullScreenWindow(this);
+                isFullscreen = true;
+            }
+            else {
+                device.setFullScreenWindow(null);
+                dispose();
+                setUndecorated(false);
+                setVisible(true);
+                isFullscreen = false;
+            }
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
         
     }
     

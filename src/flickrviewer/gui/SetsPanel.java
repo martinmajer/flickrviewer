@@ -85,6 +85,8 @@ public class SetsPanel extends FlickrPanel {
             innerPanel.add(createSetComponent(set));
         }
         
+        innerPanel.addMouseListener(flickrFrame);
+        
         setLayout(new BorderLayout(0, 0));
         final JScrollPane scrollPane = new JScrollPane(innerPanel);
         scrollPane.setBorder(null);
