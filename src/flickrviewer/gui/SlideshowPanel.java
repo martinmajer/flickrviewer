@@ -35,7 +35,7 @@ import org.imgscalr.Scalr;
 public class SlideshowPanel extends FlickrPanel implements KeyListener {
     
     
-    private static final int PRELOAD_COUNT = 5;
+    private static final int PRELOAD_COUNT = 3;
     
     
     protected PhotoSet set;
@@ -46,6 +46,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
     protected int currentIndex;
     
     protected ImagePanel currentPanel;
+    private Map<Photo, WeakReference<BufferedImage>> scaledImages = new ConcurrentHashMap();
     
     
     public SlideshowPanel(PhotoSet set, FlickrPanel previousPanel) {
@@ -144,7 +145,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         }
         else {
             hidePreloader();
-            showImagePanel(photo.image);
+            showImagePanel(photo);
             
             currentIndex = index;
             
@@ -212,25 +213,29 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
     
     
     
-    private void showImagePanel(WeakReference<BufferedImage> image) {
+    private void showImagePanel(Photo photo) {
         removeAll();
         if (currentPanel != null) {
             currentPanel.image = null;
         }
         
         setLayout(new BorderLayout());
-        currentPanel = new ImagePanel();
-        currentPanel.image = image.get();
+        currentPanel = new ImagePanel(photo);
         add(currentPanel);
         revalidate();
         repaint();
     }
     
     
-    private static class ImagePanel extends JPanel {
+    private class ImagePanel extends JPanel {
         
-        public BufferedImage image;
-        private static Map<BufferedImage, WeakReference<BufferedImage>> scaledImages = new ConcurrentHashMap();
+        public Photo photo;
+        public Image image;
+        
+        public ImagePanel(Photo photo) {
+            this.photo = photo;
+            this.image = photo.image.get();
+        }
         
         @Override
         public void paint(Graphics g) {
@@ -269,21 +274,19 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             int left = (thisWidth - renderedWidth) / 2;
             int top = (thisHeight - renderedHeight) / 2;
             
-            if (scaledImages.get(image) == null || scaledImages.get(image).get() == null || scaledImages.get(image).get().getWidth(null) != renderedWidth || scaledImages.get(image).get().getHeight(null) != renderedHeight) {
-                scaledImages.remove(image);
+            if (scaledImages.get(photo) == null || scaledImages.get(photo).get() == null || scaledImages.get(photo).get().getWidth(null) != renderedWidth || scaledImages.get(photo).get().getHeight(null) != renderedHeight) {
+                scaledImages.remove(photo);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         BufferedImage scaled = Scalr.resize((BufferedImage)image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, renderedWidth, renderedHeight);
-                        scaledImages.put(image, new WeakReference(scaled));
+                        scaledImages.put(photo, new WeakReference(scaled));
                         repaint();
-                        
-                        System.gc();
                     }
                 }).start();
             }
             
-            if (scaledImages.get(image) != null && scaledImages.get(image).get() != null) g.drawImage(scaledImages.get(image).get(), left, top, null);
+            if (scaledImages.get(photo) != null && scaledImages.get(photo).get() != null) g.drawImage(scaledImages.get(photo).get(), left, top, null);
             else g.drawImage(this.image, left, top, renderedWidth, renderedHeight, null);
         }
         
