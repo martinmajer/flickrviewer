@@ -43,12 +43,15 @@ public class UserSelectPanel extends FlickrPanel {
         okButton.setPreferredSize(new Dimension(50, 30));
         add(okButton, cnstrs);
         
-        okButton.addActionListener(new ActionListener() {
+        ActionListener okAction = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 okButtonClicked();
             }
-        });
+        };
+        
+        userName.addActionListener(okAction);
+        okButton.addActionListener(okAction);
     }
     
     private void okButtonClicked() {
