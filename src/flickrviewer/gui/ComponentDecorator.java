@@ -131,7 +131,7 @@ public class ComponentDecorator {
             @Override
             public void mouseExited(MouseEvent e) {
                 button.setBackground(Color.DARK_GRAY);
-                button.setText(null);
+                if (button.getIcon() != null) button.setText(null);
             }
         });
         
