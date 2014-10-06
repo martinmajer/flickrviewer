@@ -28,7 +28,7 @@ public class FlickrFrame extends JFrame implements WindowListener {
         
         getContentPane().setLayout(new BorderLayout(0, 0));
         getContentPane().add(currentPanel);
-        getContentPane().setPreferredSize(new Dimension(800, 600));
+        getContentPane().setPreferredSize(new Dimension(856, 600));
         
         pack();
         setLocationRelativeTo(null);
