@@ -49,6 +49,11 @@ public class FlickrFrame extends JFrame implements WindowListener, MouseListener
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
     
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if (visible && currentPanel != null) currentPanel.requestFocusInWindow();
+    }
     
     public void changePanel(FlickrPanel newPanel) {
         getContentPane().remove(currentPanel);
@@ -57,6 +62,7 @@ public class FlickrFrame extends JFrame implements WindowListener, MouseListener
         newPanel.addMouseListener(this);
         getContentPane().setPreferredSize(getContentPane().getSize());
         getContentPane().add(newPanel);
+        newPanel.requestFocusInWindow();
         currentPanel.disposePanel();
         currentPanel = newPanel;
         
