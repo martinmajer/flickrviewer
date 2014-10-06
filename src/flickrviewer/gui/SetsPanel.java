@@ -18,6 +18,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 /**
  * Panel s přehledem alb.
@@ -48,19 +50,48 @@ public class SetsPanel extends FlickrPanel {
     
     
     private void showSets() {
-        JPanel innerPanel = decoratePanel(new JPanel());
-        innerPanel.setLayout(new FlowLayout());
+        final JPanel innerPanel = decoratePanel(new JPanel());
+        // innerPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        innerPanel.setLayout(new SetsLayout());
         
         for (PhotoSet set: sets) {
-            innerPanel.add(decorateLabel(new JLabel(set.title)));
+            innerPanel.add(createSetComponent(set));
         }
         
         setLayout(new BorderLayout(0, 0));
-        JScrollPane scrollPane = new JScrollPane(innerPanel);
+        final JScrollPane scrollPane = new JScrollPane(innerPanel);
+        scrollPane.setBorder(null);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        
+        scrollPane.addComponentListener(new ComponentListener() {
+            @Override
+            public void componentShown(ComponentEvent e) {}
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Dimension jspSize = ((JScrollPane)e.getComponent()).getViewport().getSize();
+                innerPanel.setBounds(0, 0, jspSize.width, jspSize.height);
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {}
+
+            @Override
+            public void componentHidden(ComponentEvent e) {}
+        });
+        
         add(scrollPane, BorderLayout.CENTER);
+        // add(innerPanel, BorderLayout.CENTER);
         
         revalidate();
         repaint();
+    }
+    
+    private JComponent createSetComponent(PhotoSet set) {
+        JButton setButton = decorateButton(new JButton(set.title));
+        setButton.setPreferredSize(new Dimension(128, 128));
+        
+        return setButton;
     }
     
     
