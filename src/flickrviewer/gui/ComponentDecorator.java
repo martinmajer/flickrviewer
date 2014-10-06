@@ -12,8 +12,6 @@ import java.awt.event.MouseListener;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.plaf.metal.*;
-import javax.swing.text.StyleConstants;
-import sun.swing.SwingUtilities2;
 
 /**
  * Třída pro jednoduché nastavení vzhledu Swing komponent (metal look & feel).
