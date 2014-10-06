@@ -8,6 +8,8 @@ package flickrviewer.api;
 
 import flickrviewer.async.AsyncJob;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.lang.ref.WeakReference;
 
 /**
  * Fotka na Flickr.
@@ -32,7 +34,11 @@ public class Photo {
     
     
     
-    public transient volatile Image image;
+    // public transient volatile Image image;
+    // public transient volatile AsyncJob loadingJob;
+    
+    public volatile WeakReference<BufferedImage> image;
     public transient volatile AsyncJob loadingJob;
+    
     
 }
