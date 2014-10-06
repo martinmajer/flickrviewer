@@ -46,7 +46,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
     protected int currentIndex;
     
     protected ImagePanel currentPanel;
-    private Map<Photo, WeakReference<BufferedImage>> scaledImages = new ConcurrentHashMap();
+    private Map<Photo, SoftReference<BufferedImage>> scaledImages = new ConcurrentHashMap();
     
     
     public SlideshowPanel(PhotoSet set, FlickrPanel previousPanel) {
@@ -183,7 +183,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         
         @Override
         public Object loadData() throws FlickrException {
-            photo.image = new WeakReference((BufferedImage)PhotoDownloader.download(photo.originalUrl));
+            photo.image = new SoftReference((BufferedImage)PhotoDownloader.download(photo.originalUrl));
             return true;
         }
 
@@ -280,7 +280,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
                     @Override
                     public void run() {
                         BufferedImage scaled = Scalr.resize((BufferedImage)image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, renderedWidth, renderedHeight);
-                        scaledImages.put(photo, new WeakReference(scaled));
+                        scaledImages.put(photo, new SoftReference(scaled));
                         repaint();
                     }
                 }).start();
