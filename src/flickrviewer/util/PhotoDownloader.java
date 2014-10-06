@@ -23,6 +23,7 @@ public class PhotoDownloader {
      * @return 
      */
     public static Image download(String url) {
+        System.out.println("PhotoDownloader: " + url);
         try {
             return ImageIO.read(new URL(url));
         }
