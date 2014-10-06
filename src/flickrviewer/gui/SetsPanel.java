@@ -18,6 +18,7 @@ import java.net.MalformedURLException;
 
 import static flickrviewer.gui.ComponentDecorator.*;
 import flickrviewer.util.PhotoDownloader;
+import java.util.ArrayList;
 
 /**
  * Panel s přehledem alb.
@@ -34,6 +35,7 @@ public class SetsPanel extends FlickrPanel {
     private String userId;
     
     private List<PhotoSet> sets;
+    private List<JButton> buttons;
     
     public SetsPanel(String username) {
         this.username = username;
@@ -110,9 +112,12 @@ public class SetsPanel extends FlickrPanel {
         // innerPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
         innerPanel.setLayout(new SetsLayout());
         
+        buttons = new ArrayList();
+        
         for (PhotoSet set: sets) {
             JButton button = createSetButton(set);
             innerPanel.add(button);
+            buttons.add(button);
             
             AsyncLoader.getInstance().load(new LoadSetCover(set, button));
         }
@@ -149,11 +154,29 @@ public class SetsPanel extends FlickrPanel {
         repaint();
     }
     
-    private JButton createSetButton(PhotoSet set) {
+    private void buttonsMouseExited() {
+        for (JButton b: buttons) {
+            for (MouseListener m: b.getMouseListeners()) {
+                m.mouseExited(new MouseEvent(b, 0, 0, 0, 0, 0, 1, false));
+            }
+        }
+    }
+    
+    private JButton createSetButton(final PhotoSet set) {
         JButton setButton = decorateSetButton(new JButton(set.title));
         setButton.setVerticalTextPosition(SwingConstants.CENTER);
         setButton.setHorizontalTextPosition(SwingConstants.CENTER);
         setButton.setPreferredSize(new Dimension(SET_BUTTON_WIDTH, SET_BUTTON_HEIGHT));
+        
+        final FlickrPanel that = this;
+        
+        setButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buttonsMouseExited();
+                flickrFrame.changePanel(new SlideshowPanel(set, that));
+            }
+        });
         
         return setButton;
     }
