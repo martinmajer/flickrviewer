@@ -138,7 +138,7 @@ public class FlickrAPI {
      * @return 
      */
     public List<PhotoSet> getSets(String userId) {
-        String response = call("flickr.photosets.getList", "user_id=" + urlEncode(userId));
+        String response = call("flickr.photosets.getList", "user_id=" + urlEncode(userId) + "&primary_photo_extras=url_q");
         JSONObject json = (JSONObject)jsonParse(response);
         if (json == null) return null;
         
@@ -153,6 +153,7 @@ public class FlickrAPI {
             set.id = Long.parseLong(photoset.get("id").toString());
             set.title = ((JSONObject)photoset.get("title")).get("_content").toString();
             set.description = ((JSONObject)photoset.get("title")).get("_content").toString();
+            set.coverUrl = ((JSONObject)photoset.get("primary_photo_extras")).get("url_q").toString();
             
             sets.add(set);
         }

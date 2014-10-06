@@ -21,4 +21,7 @@ public class PhotoSet {
     /** Popis alba. */
     public String description;
     
+    /** URL úvodní fotky alba (velikost medium). */
+    public String coverUrl;
+    
 }
