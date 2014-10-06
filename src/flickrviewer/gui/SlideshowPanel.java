@@ -35,7 +35,7 @@ import org.imgscalr.Scalr;
 public class SlideshowPanel extends FlickrPanel implements KeyListener {
     
     
-    private static final int PRELOAD_COUNT = 3;
+    private static final int PRELOAD_COUNT = 2;
     
     
     protected PhotoSet set;
@@ -147,19 +147,32 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             hidePreloader();
             showImagePanel(photo);
             
-            currentIndex = index;
-            
             System.out.println("Photo " + currentIndex);
             
             // načtení následujících fotek
-            int nextIndex = currentIndex + 1;
-            while (nextIndex < photos.size() && nextIndex - currentIndex <= PRELOAD_COUNT) {
-                Photo next = photos.get(nextIndex);
-                if ((next.image == null || next.image.get() == null) && next.loadingJob == null) {
-                    AsyncLoader.getInstance().load(new LoadPhoto(next, nextIndex, false));
+            if (index > currentIndex) {
+                int nextIndex = index + 1;
+                while (nextIndex < photos.size() && nextIndex - index <= PRELOAD_COUNT) {
+                    Photo next = photos.get(nextIndex);
+                    if ((next.image == null || next.image.get() == null) && next.loadingJob == null) {
+                        AsyncLoader.getInstance().load(new LoadPhoto(next, nextIndex, false));
+                    }
+                    nextIndex++;
                 }
-                nextIndex++;
             }
+            // načtení předchozích fotek
+            else if (index < currentIndex) {
+                int prevIndex = index - 1;
+                while (prevIndex >= 0 && index - prevIndex <= PRELOAD_COUNT) {
+                    Photo prev = photos.get(prevIndex);
+                    if ((prev.image == null || prev.image.get() == null) && prev.loadingJob == null) {
+                        AsyncLoader.getInstance().load(new LoadPhoto(prev, prevIndex, false));
+                    }
+                    prevIndex--;
+                }
+            }
+            
+            currentIndex = index;
             
         }
     }
