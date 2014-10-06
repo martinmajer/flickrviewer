@@ -17,6 +17,7 @@ import java.awt.event.*;
 import java.net.MalformedURLException;
 
 import static flickrviewer.gui.ComponentDecorator.*;
+import flickrviewer.util.PhotoDownloader;
 
 /**
  * Panel s přehledem alb.
@@ -89,19 +90,15 @@ public class SetsPanel extends FlickrPanel {
         
         @Override
         public Object loadData() throws FlickrException {
-            try {
-                ImageIcon icon = new ImageIcon(new URL(set.coverUrl));
-                return icon;
-            } catch (MalformedURLException ex) {
-                return null;
-            }
+            Image image = PhotoDownloader.download(set.coverUrl);
+            return image;
         }
 
         @Override
         public void done(Object data, FlickrException ex) {
             if (data != null) {
                 setButton.setText(null);
-                setButton.setIcon((ImageIcon)data);
+                setButton.setIcon(new ImageIcon((Image)data));
             }
         }
         

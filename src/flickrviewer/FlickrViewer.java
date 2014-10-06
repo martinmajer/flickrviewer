@@ -9,6 +9,7 @@ package flickrviewer;
 import flickrviewer.gui.*;
 import java.awt.Color;
 import java.io.File;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 /**
@@ -28,6 +29,7 @@ public class FlickrViewer {
         boolean isCommandLine = false; // @todo
         
         initAppDir();
+        setImageCache();
         
         if (!isCommandLine) {
             setLookAndFeel();
@@ -49,6 +51,13 @@ public class FlickrViewer {
             if (appDir.isFile()) appDir.delete();
             appDir.mkdir();
         }
+    }
+    
+    private static void setImageCache() {
+        File imageCacheDir = new File(getDataDirectory() + "/cache");
+        if (!imageCacheDir.isDirectory()) imageCacheDir.mkdir();
+        ImageIO.setCacheDirectory(imageCacheDir);
+        System.out.println("FlickrViewer: image cache " + ImageIO.getCacheDirectory());
     }
     
     private static void setLookAndFeel() {
