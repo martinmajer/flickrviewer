@@ -20,6 +20,8 @@ import java.lang.ref.SoftReference;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.swing.*;
 import org.imgscalr.Scalr;
 
@@ -44,6 +46,9 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
     private Map<Photo, SoftReference<BufferedImage>> scaledImages = new ConcurrentHashMap();
     
     
+    private ExecutorService scalrThreadExecutor;
+    
+    
     public SlideshowPanel(PhotoSet set, FlickrPanel previousPanel) {
         this.set = set;
         this.previousPanel = previousPanel;
@@ -53,6 +58,8 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         
         setFocusable(true);
         addKeyListener(this);
+        
+        scalrThreadExecutor = Executors.newSingleThreadExecutor();
         
         AsyncLoader.getInstance().load(new LoadPhotos());
     }
@@ -284,14 +291,14 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             
             if (scaledImages.get(photo) == null || scaledImages.get(photo).get() == null || scaledImages.get(photo).get().getWidth(null) != renderedWidth || scaledImages.get(photo).get().getHeight(null) != renderedHeight) {
                 scaledImages.remove(photo);
-                new Thread(new Runnable() {
+                scalrThreadExecutor.submit(new Runnable() {
                     @Override
                     public void run() {
                         BufferedImage scaled = Scalr.resize((BufferedImage)image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, renderedWidth, renderedHeight);
                         scaledImages.put(photo, new SoftReference(scaled));
                         repaint();
                     }
-                }).start();
+                });
             }
             
             if (scaledImages.get(photo) != null && scaledImages.get(photo).get() != null) g.drawImage(scaledImages.get(photo).get(), left, top, null);
