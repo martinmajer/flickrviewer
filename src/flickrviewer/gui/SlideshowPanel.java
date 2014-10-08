@@ -15,17 +15,12 @@ import static flickrviewer.gui.ComponentDecorator.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.*;
-import org.imgscalr.Scalr;
 import org.imgscalr.Scalr;
 
 /**
@@ -240,7 +235,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
     }
     
     
-    private class ImagePanel extends JPanel {
+    protected class ImagePanel extends JPanel {
         
         public Photo photo;
         public Image image;
