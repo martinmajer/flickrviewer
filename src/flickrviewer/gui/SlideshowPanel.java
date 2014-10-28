@@ -32,7 +32,7 @@ import org.imgscalr.Scalr;
 public class SlideshowPanel extends FlickrPanel implements KeyListener {
     
     
-    private static final int PRELOAD_COUNT = 2;
+    private static final int PRELOAD_COUNT = 3;
     
     
     protected PhotoSet set;
