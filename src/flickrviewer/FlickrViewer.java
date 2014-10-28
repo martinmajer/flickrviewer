@@ -43,6 +43,10 @@ public class FlickrViewer {
         return System.getProperty("user.home")  + "/.flickrviewer";
     }
     
+    public static String getImageCacheDirectory() {
+        return getDataDirectory() + "/cache";
+    }
+    
     private static void initAppDir() {
         String appDirPath = getDataDirectory();
         System.out.println("FlickrViewer: application data " + appDirPath);
@@ -54,9 +58,10 @@ public class FlickrViewer {
     }
     
     private static void setImageCache() {
-        File imageCacheDir = new File(getDataDirectory() + "/cache");
+        File imageCacheDir = new File(getImageCacheDirectory());
         if (!imageCacheDir.isDirectory()) imageCacheDir.mkdir();
-        ImageIO.setCacheDirectory(imageCacheDir);
+        // ImageIO.setCacheDirectory(imageCacheDir);
+        ImageIO.setUseCache(false);
         System.out.println("FlickrViewer: image cache " + ImageIO.getCacheDirectory());
     }
     
