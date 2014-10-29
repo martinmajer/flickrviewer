@@ -32,7 +32,7 @@ import org.imgscalr.Scalr;
 public class SlideshowPanel extends FlickrPanel implements KeyListener {
     
     
-    private static final int PRELOAD_COUNT = 3;
+    private static final int PRELOAD_COUNT = 2;
     
     
     protected PhotoSet set;
@@ -134,6 +134,8 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         Photo photo = photos.get(index);
         
         if (photo.image == null || photo.image.get() == null) {
+            if (photo.image != null) System.out.println("Photo lost " + index);
+            
             showPreloader();
             if (photo.loadingJob == null) {
                 AsyncJob job = new LoadPhoto(photo, index, true);
@@ -148,12 +150,13 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             hidePreloader();
             showImagePanel(photo);
             
-            System.out.println("Photo " + currentIndex);
+            System.out.println("Photo " + index);
             
             // načtení následujících fotek
-            if (index > currentIndex) {
+            if (index >= currentIndex) {
                 int nextIndex = index + 1;
                 while (nextIndex < photos.size() && nextIndex - index <= PRELOAD_COUNT) {
+                    System.out.println("Preloading " + nextIndex);
                     Photo next = photos.get(nextIndex);
                     if ((next.image == null || next.image.get() == null) && next.loadingJob == null) {
                         AsyncLoader.getInstance().load(new LoadPhoto(next, nextIndex, false));
@@ -165,6 +168,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             else if (index < currentIndex) {
                 int prevIndex = index - 1;
                 while (prevIndex >= 0 && index - prevIndex <= PRELOAD_COUNT) {
+                    System.out.println("Preloading " + prevIndex);
                     Photo prev = photos.get(prevIndex);
                     if ((prev.image == null || prev.image.get() == null) && prev.loadingJob == null) {
                         AsyncLoader.getInstance().load(new LoadPhoto(prev, prevIndex, false));
