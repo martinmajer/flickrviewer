@@ -62,7 +62,7 @@ public class FlickrViewer {
         if (!imageCacheDir.isDirectory()) imageCacheDir.mkdir();
         // ImageIO.setCacheDirectory(imageCacheDir);
         ImageIO.setUseCache(false);
-        System.out.println("FlickrViewer: image cache " + ImageIO.getCacheDirectory());
+        System.out.println("FlickrViewer: image cache " + imageCacheDir);
     }
     
     private static void setLookAndFeel() {
