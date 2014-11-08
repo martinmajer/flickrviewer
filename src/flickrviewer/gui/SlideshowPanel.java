@@ -166,9 +166,9 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             if (index >= currentIndex) {
                 int nextIndex = index + 1;
                 while (nextIndex < photos.size() && nextIndex - index <= PRELOAD_COUNT) {
-                    System.out.println("Preloading " + nextIndex);
                     Photo next = photos.get(nextIndex);
-                    if ((downloadedImages.get(photo) == null || downloadedImages.get(photo).get() == null) && loadingJobs.get(photo) == null) {
+                    if ((downloadedImages.get(next) == null || downloadedImages.get(next).get() == null) && loadingJobs.get(next) == null) {
+                        System.out.println("Preloading " + nextIndex);
                         AsyncLoader.getInstance().load(new LoadPhoto(next, nextIndex, false));
                     }
                     nextIndex++;
@@ -178,9 +178,9 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             else if (index < currentIndex) {
                 int prevIndex = index - 1;
                 while (prevIndex >= 0 && index - prevIndex <= PRELOAD_COUNT) {
-                    System.out.println("Preloading " + prevIndex);
                     Photo prev = photos.get(prevIndex);
-                    if ((downloadedImages.get(photo) == null || downloadedImages.get(photo).get() == null) && loadingJobs.get(photo) == null) {
+                    if ((downloadedImages.get(prev) == null || downloadedImages.get(prev).get() == null) && loadingJobs.get(prev) == null) {
+                        System.out.println("Preloading " + prevIndex);
                         AsyncLoader.getInstance().load(new LoadPhoto(prev, prevIndex, false));
                     }
                     prevIndex--;
