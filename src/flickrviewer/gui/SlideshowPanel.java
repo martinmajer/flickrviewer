@@ -201,7 +201,11 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         
         @Override
         public Object loadData() throws FlickrException {
-            photo.image = new SoftReference((BufferedImage)PhotoDownloader.download(photo.originalUrl));
+            String photoUrl = photo.large2048url;
+            if (photoUrl == null || photoUrl.equals("")) photoUrl = photo.large1600url;
+            if (photoUrl == null || photoUrl.equals("")) photoUrl = photo.large1024url;
+            
+            photo.image = new SoftReference((BufferedImage)PhotoDownloader.download(photoUrl));
             return true;
         }
 
