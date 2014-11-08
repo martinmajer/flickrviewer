@@ -177,7 +177,7 @@ public class FlickrAPI {
         List<Photo> photos = new ArrayList();
         
         while (total == -1 || (page - 1) * perPage < total) {
-            String response = call("flickr.photosets.getPhotos", "photoset_id=" + set.id + "&media=photos&extras=url_l,url_o&per_page=" + perPage + "&page=" + page);
+            String response = call("flickr.photosets.getPhotos", "photoset_id=" + set.id + "&media=photos&extras=url_l,url_o,url_k,url_h&per_page=" + perPage + "&page=" + page);
             JSONObject json = (JSONObject)jsonParse(response);
             if (json == null) return null;
 
@@ -191,7 +191,9 @@ public class FlickrAPI {
                 Photo photo = new Photo();
                 photo.id = Long.parseLong(photoJson.get("id").toString());
                 photo.title = (String)photoJson.get("title");
-                photo.largeUrl = (String)photoJson.get("url_l");
+                photo.large1024url = (String)photoJson.get("url_l");
+                photo.large1600url = (String)photoJson.get("url_h");
+                photo.large2048url = (String)photoJson.get("url_k");
                 photo.originalUrl = (String)photoJson.get("url_o");
                 
                 photos.add(photo);

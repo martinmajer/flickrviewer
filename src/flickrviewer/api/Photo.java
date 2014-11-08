@@ -28,7 +28,13 @@ public class Photo {
     public String description;
     
     /** Malá velikost. */
-    public String largeUrl;
+    public String large1024url;
+    
+    /** Střední velikost. */
+    public String large1600url;
+    
+    /** Velká velikost. */
+    public String large2048url;
     
     /** Originální velikost. */
     public String originalUrl;
