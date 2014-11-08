@@ -15,6 +15,9 @@ import static flickrviewer.gui.ComponentDecorator.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.lang.ref.SoftReference;
 import java.util.List;
@@ -29,7 +32,7 @@ import org.imgscalr.Scalr;
  * Panel pro prohlížení fotek.
  * @author Martin
  */
-public class SlideshowPanel extends FlickrPanel implements KeyListener {
+public class SlideshowPanel extends FlickrPanel implements KeyListener, MouseListener, MouseMotionListener {
     
     /** Určuje, kolik fotek se bude dopředu načítat. */
     private static final int PRELOAD_COUNT = 3;
@@ -71,7 +74,10 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         showPreloader();
         
         setFocusable(true);
+        
         addKeyListener(this);
+        addMouseListener(this);
+        addMouseMotionListener(this);
         
         scalrThreadExecutor = Executors.newSingleThreadExecutor();
         
@@ -99,6 +105,71 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
     public void keyReleased(KeyEvent e) {
         
     }
+    
+    
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        int x = e.getX();
+        int y = e.getY();
+        int width = getWidth();
+        int height = getHeight();
+        
+        if (y >= height / 3 && y < height * 2 / 3) {
+            e.consume();
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        int x = e.getX();
+        int y = e.getY();
+        int width = getWidth();
+        int height = getHeight();
+        
+        if (y >= height / 3 && y < height * 2 / 3) {
+            if (x >= width / 2) showNext();
+            else showPrevious();
+            e.consume();
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        changeMouseCursor(e.getX(), e.getY());
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        
+    }
+    
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        changeMouseCursor(e.getX(), e.getY());
+    }
+    
+    
+    private void changeMouseCursor(int x, int y) {
+        int height = getHeight();
+        
+        if (y >= height / 3 && y < height * 2 / 3) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        }
+        else {
+            setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
+    }
+    
     
     
     /** Stisk Escape. */
