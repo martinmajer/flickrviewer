@@ -335,7 +335,13 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener, MouseLis
             if (photoUrl == null || photoUrl.equals("")) photoUrl = photo.large1024url;
             
             // fotku uložíme jako soft referenci, aby mohla být odstraněna, když začne docházet paměť
-            downloadedImages.put(photo, new SoftReference((BufferedImage)PhotoDownloader.download(photoUrl)));
+            BufferedImage downloaded = (BufferedImage)PhotoDownloader.download(photoUrl);
+            downloadedImages.put(photo, new SoftReference(downloaded));
+            
+            // necháme ji zmenšit
+            Dimension renderedDim = getRenderedDimension(downloaded, getWidth(), getHeight());
+            scalrThreadExecutor.submit(new ScalePhotoThread(photo, renderedDim.width, renderedDim.height));
+            
             return true;
         }
 
@@ -366,6 +372,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener, MouseLis
             this.image = downloadedImages.get(photo).get();
         }
         
+        
         @Override
         public void paint(Graphics g) {
             int thisWidth = getWidth();
@@ -378,27 +385,12 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener, MouseLis
             
             Graphics2D g2 = (Graphics2D)g;
             
-            int imageWidth = image.getWidth(null);
-            int imageHeight = image.getHeight(null);
-            
             final int renderedWidth;
             final int renderedHeight;
             
-            float imageRatio = (float)imageWidth / (float)imageHeight;
-            float thisRatio = (float)thisWidth / (float)thisHeight;
-            
-            if (imageRatio > thisRatio) {
-                renderedWidth = thisWidth;
-                renderedHeight = (int)(thisWidth / imageRatio);
-            }
-            else if (imageRatio < thisRatio) {
-                renderedHeight = thisHeight;
-                renderedWidth = (int)(thisHeight * imageRatio);
-            }
-            else {
-                renderedWidth = thisWidth;
-                renderedHeight = thisHeight;
-            }
+            Dimension renderedDim = getRenderedDimension(image, thisWidth, thisHeight);
+            renderedWidth = renderedDim.width;
+            renderedHeight = renderedDim.height;
             
             int left = (thisWidth - renderedWidth) / 2;
             int top = (thisHeight - renderedHeight) / 2;
@@ -406,18 +398,64 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener, MouseLis
             // při prvním vykreslení fotku zmenšíme přesně na velikost okna, po zmenšení ji překreslíme
             if (scaledImages.get(photo) == null || scaledImages.get(photo).get() == null || scaledImages.get(photo).get().getWidth(null) != renderedWidth || scaledImages.get(photo).get().getHeight(null) != renderedHeight) {
                 scaledImages.remove(photo);
-                scalrThreadExecutor.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        BufferedImage scaled = Scalr.resize((BufferedImage)image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, renderedWidth, renderedHeight);
-                        scaledImages.put(photo, new SoftReference(scaled));
-                        repaint();
-                    }
-                });
+                scalrThreadExecutor.submit(new ScalePhotoThread(photo, renderedWidth, renderedHeight));
             }
             
             if (scaledImages.get(photo) != null && scaledImages.get(photo).get() != null) g.drawImage(scaledImages.get(photo).get(), left, top, null);
             else g.drawImage(this.image, left, top, renderedWidth, renderedHeight, null);
+        }
+        
+    }
+    
+    /** Vrátí velikost obrázku, který bude zmenšený na plátno zadaných rozměrů. */
+    public Dimension getRenderedDimension(Image image, int canvasWidth, int canvasHeight) {
+        int imageWidth = image.getWidth(null);
+        int imageHeight = image.getHeight(null);
+        
+        float imageRatio = (float)imageWidth / (float)imageHeight;
+        float thisRatio = (float)canvasWidth / (float)canvasHeight;
+
+        int renderedWidth, renderedHeight;
+        
+        if (imageRatio > thisRatio) {
+            renderedWidth = canvasWidth;
+            renderedHeight = (int)(canvasWidth / imageRatio);
+        }
+        else if (imageRatio < thisRatio) {
+            renderedHeight = canvasHeight;
+            renderedWidth = (int)(canvasHeight * imageRatio);
+        }
+        else {
+            renderedWidth = canvasWidth;
+            renderedHeight = canvasHeight;
+        }
+        
+        return new Dimension(renderedWidth, renderedHeight);
+    }
+    
+    
+    
+    protected class ScalePhotoThread implements Runnable {
+        
+        private Photo photo;
+        private int width;
+        private int height;
+        
+        public ScalePhotoThread(Photo photo, int width, int height) {
+            this.photo = photo;
+            this.width = width;
+            this.height = height;
+        }
+
+        @Override
+        public void run() {
+            Image image = downloadedImages.get(photo).get();
+            if (image == null) return;
+            
+            BufferedImage scaled = Scalr.resize((BufferedImage)image, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, width, height);
+            scaledImages.put(photo, new SoftReference(scaled));
+            
+            if (photo == photos.get(currentIndex)) currentImagePanel.repaint();
         }
         
     }
