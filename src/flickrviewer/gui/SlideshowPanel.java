@@ -31,21 +31,35 @@ import org.imgscalr.Scalr;
  */
 public class SlideshowPanel extends FlickrPanel implements KeyListener {
     
-    
+    /** Určuje, kolik fotek se bude dopředu načítat. */
     private static final int PRELOAD_COUNT = 3;
     
-    
+    /** Aktuální album. */
     protected PhotoSet set;
+    
+    /** Fotky v albu. */
     protected List<Photo> photos;
     
+    /** Reference na předchozí panel. */
     private FlickrPanel previousPanel;
     
+    /** Index aktuální fotky. */
     protected int currentIndex;
     
-    protected ImagePanel currentPanel;
+    /** Aktuální panel se zobrazenou fotkou. */
+    protected ImagePanel currentImagePanel;
+    
+    /** Mapa stažených fotek. */
+    private Map<Photo, SoftReference<BufferedImage>> downloadedImages = new ConcurrentHashMap<>();
+    
+    /** Mapa úloh pro načítání fotek. */
+    private Map<Photo, LoadPhoto> loadingJobs = new ConcurrentHashMap<>();
+    
+    /** Mapa zmenšených fotek (na velikost obrazovky). */
     private Map<Photo, SoftReference<BufferedImage>> scaledImages = new ConcurrentHashMap();
     
     
+    /** Spouštěč vlákna pro škálování obrázků. */
     private ExecutorService scalrThreadExecutor;
     
     
@@ -61,6 +75,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         
         scalrThreadExecutor = Executors.newSingleThreadExecutor();
         
+        // stažení seznamu fotek z alba
         AsyncLoader.getInstance().load(new LoadPhotos());
     }
 
@@ -86,6 +101,116 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
     }
     
     
+    /** Stisk Escape. */
+    @Override
+    public boolean escapeAction() {
+        if (previousPanel != null) {
+            flickrFrame.changePanel(previousPanel);
+            return true;
+        }
+        else return false;
+    }
+    
+    
+    /** Spustí slideshow - zobrazí první fotku. */
+    public void startSlideshow() {
+        showPhoto(0);
+    }
+    
+    /** Zobrazí další fotku. */
+    public void showNext() {
+        if (photos != null && currentIndex < photos.size() - 1) {
+            showPhoto(currentIndex + 1);
+        }
+    }
+    
+    /** Zobrazí předchozí fotku. */
+    public void showPrevious() {
+        if (photos != null && currentIndex > 0) {
+            showPhoto(currentIndex - 1);
+        }
+    }
+    
+    /** 
+     * Zobrazí fotku. 
+     * @param index index fotky
+     */
+    public void showPhoto(int index) {
+        if (photos.isEmpty()) return;
+        
+        Photo photo = photos.get(index);
+        SoftReference imageSoftRef = downloadedImages.get(photo);
+        
+        // pokud nebyla fotka načtená, nebo byla odstraněná z paměti, je potřeba ji nahrát
+        if (imageSoftRef == null || imageSoftRef.get() == null) {
+            if (imageSoftRef != null) System.out.println("Photo lost " + index);
+            
+            showPreloader();
+            
+            if (loadingJobs.get(photo) == null) { // ještě neprobíhá načítání
+                AsyncJob job = new LoadPhoto(photo, index, true);
+                AsyncLoader.getInstance().load(job);
+            }
+            else { // probíhá načítání
+                LoadPhoto job = loadingJobs.get(photo);
+                job.showAfterLoaded = true; // zobrazit fotku po načtení
+            }
+        }
+        else {
+            hidePreloader();
+            showImagePanel(photo); // zobrazení fotky
+            
+            System.out.println("Photo " + index);
+            
+            // načtení následujících fotek
+            if (index >= currentIndex) {
+                int nextIndex = index + 1;
+                while (nextIndex < photos.size() && nextIndex - index <= PRELOAD_COUNT) {
+                    System.out.println("Preloading " + nextIndex);
+                    Photo next = photos.get(nextIndex);
+                    if ((downloadedImages.get(photo) == null || downloadedImages.get(photo).get() == null) && loadingJobs.get(photo) == null) {
+                        AsyncLoader.getInstance().load(new LoadPhoto(next, nextIndex, false));
+                    }
+                    nextIndex++;
+                }
+            }
+            // načtení předchozích fotek
+            else if (index < currentIndex) {
+                int prevIndex = index - 1;
+                while (prevIndex >= 0 && index - prevIndex <= PRELOAD_COUNT) {
+                    System.out.println("Preloading " + prevIndex);
+                    Photo prev = photos.get(prevIndex);
+                    if ((downloadedImages.get(photo) == null || downloadedImages.get(photo).get() == null) && loadingJobs.get(photo) == null) {
+                        AsyncLoader.getInstance().load(new LoadPhoto(prev, prevIndex, false));
+                    }
+                    prevIndex--;
+                }
+            }
+            
+            currentIndex = index;
+            
+        }
+    }
+    
+    
+    /** Zobrazí panel s fotkou. */
+    private void showImagePanel(Photo photo) {
+        removeAll();
+        if (currentImagePanel != null) {
+            currentImagePanel.image = null;
+        }
+        
+        setLayout(new BorderLayout());
+        currentImagePanel = new ImagePanel(photo);
+        add(currentImagePanel);
+        revalidate();
+        repaint();
+    }
+    
+    
+    
+    
+    /** Úloha pro asynchronní načtení seznamu fotek. */
     private class LoadPhotos implements AsyncJob, AsyncJob.Priority {
 
         @Override
@@ -112,100 +237,34 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
     }
     
     
-    public void startSlideshow() {
-        showPhoto(0);
-    }
     
-    public void showNext() {
-        if (photos != null && currentIndex < photos.size() - 1) {
-            showPhoto(currentIndex + 1);
-        }
-    }
-    
-    public void showPrevious() {
-        if (photos != null && currentIndex > 0) {
-            showPhoto(currentIndex - 1);
-        }
-    }
-    
-    public void showPhoto(int index) {
-        if (photos.isEmpty()) return;
-        
-        Photo photo = photos.get(index);
-        
-        if (photo.image == null || photo.image.get() == null) {
-            if (photo.image != null) System.out.println("Photo lost " + index);
-            
-            showPreloader();
-            if (photo.loadingJob == null) {
-                AsyncJob job = new LoadPhoto(photo, index, true);
-                AsyncLoader.getInstance().load(job);
-            }
-            else {
-                LoadPhoto job = (LoadPhoto)photo.loadingJob;
-                job.showAfterLoaded = true;
-            }
-        }
-        else {
-            hidePreloader();
-            showImagePanel(photo);
-            
-            System.out.println("Photo " + index);
-            
-            // načtení následujících fotek
-            if (index >= currentIndex) {
-                int nextIndex = index + 1;
-                while (nextIndex < photos.size() && nextIndex - index <= PRELOAD_COUNT) {
-                    System.out.println("Preloading " + nextIndex);
-                    Photo next = photos.get(nextIndex);
-                    if ((next.image == null || next.image.get() == null) && next.loadingJob == null) {
-                        AsyncLoader.getInstance().load(new LoadPhoto(next, nextIndex, false));
-                    }
-                    nextIndex++;
-                }
-            }
-            // načtení předchozích fotek
-            else if (index < currentIndex) {
-                int prevIndex = index - 1;
-                while (prevIndex >= 0 && index - prevIndex <= PRELOAD_COUNT) {
-                    System.out.println("Preloading " + prevIndex);
-                    Photo prev = photos.get(prevIndex);
-                    if ((prev.image == null || prev.image.get() == null) && prev.loadingJob == null) {
-                        AsyncLoader.getInstance().load(new LoadPhoto(prev, prevIndex, false));
-                    }
-                    prevIndex--;
-                }
-            }
-            
-            currentIndex = index;
-            
-        }
-    }
-    
-    
-    
+    /** Úloha pro asynchronní načítání fotek z Flickru. */
     private class LoadPhoto implements AsyncJob, AsyncJob.Priority {
-
-        // @todo zařídit, aby se nikdy nenačítalo víckrát najednou
         
+        /** Fotka. */
         private Photo photo;
+        
+        /** Pořadí fotky. */
         private int index;
+        
+        /** Zobrazit fotku po načtení? */
         private boolean showAfterLoaded;
         
         public LoadPhoto(Photo photo, int index, boolean showAfterLoaded) {
             this.photo = photo;
             this.index = index;
             this.showAfterLoaded = showAfterLoaded;
-            photo.loadingJob = this;
+            loadingJobs.put(photo, this);
         }
         
         @Override
         public Object loadData() throws FlickrException {
-            String photoUrl = photo.large2048url;
+            String photoUrl = photo.large2048url; // načteme největší možnou velikost
             if (photoUrl == null || photoUrl.equals("")) photoUrl = photo.large1600url;
             if (photoUrl == null || photoUrl.equals("")) photoUrl = photo.large1024url;
             
-            photo.image = new SoftReference((BufferedImage)PhotoDownloader.download(photoUrl));
+            // fotku uložíme jako soft referenci, aby mohla být odstraněna, když začne docházet paměť
+            downloadedImages.put(photo, new SoftReference((BufferedImage)PhotoDownloader.download(photoUrl)));
             return true;
         }
 
@@ -214,7 +273,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             if ((Boolean)data == true) {
                 if (showAfterLoaded) showPhoto(index);
             }
-            photo.loadingJob = null;
+            loadingJobs.remove(photo);
         }
 
         @Override
@@ -224,31 +283,8 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         
     }
     
-    @Override
-    public boolean escapeAction() {
-        if (previousPanel != null) {
-            flickrFrame.changePanel(previousPanel);
-            return true;
-        }
-        else return false;
-    }
     
-    
-    
-    private void showImagePanel(Photo photo) {
-        removeAll();
-        if (currentPanel != null) {
-            currentPanel.image = null;
-        }
-        
-        setLayout(new BorderLayout());
-        currentPanel = new ImagePanel(photo);
-        add(currentPanel);
-        revalidate();
-        repaint();
-    }
-    
-    
+    /** Pomocná třída pro panel s fotkou. */
     protected class ImagePanel extends JPanel {
         
         public Photo photo;
@@ -256,7 +292,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
         
         public ImagePanel(Photo photo) {
             this.photo = photo;
-            this.image = photo.image.get();
+            this.image = downloadedImages.get(photo).get();
         }
         
         @Override
@@ -296,6 +332,7 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener {
             int left = (thisWidth - renderedWidth) / 2;
             int top = (thisHeight - renderedHeight) / 2;
             
+            // při prvním vykreslení fotku zmenšíme přesně na velikost okna, po zmenšení ji překreslíme
             if (scaledImages.get(photo) == null || scaledImages.get(photo).get() == null || scaledImages.get(photo).get().getWidth(null) != renderedWidth || scaledImages.get(photo).get().getHeight(null) != renderedHeight) {
                 scaledImages.remove(photo);
                 scalrThreadExecutor.submit(new Runnable() {

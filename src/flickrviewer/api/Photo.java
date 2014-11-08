@@ -41,11 +41,12 @@ public class Photo {
     
     
     
-    // public transient volatile Image image;
-    // public transient volatile AsyncJob loadingJob;
     
-    public volatile SoftReference<BufferedImage> image;
-    public transient volatile AsyncJob loadingJob;
+    /** Stažená fotka. */
+    // public volatile SoftReference<BufferedImage> image;
+    
+    /** Úloha pro asynchronní načtení fotky. */
+    // public transient volatile AsyncJob loadingJob;
     
     
 }
