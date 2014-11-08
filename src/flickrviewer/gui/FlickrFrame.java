@@ -8,7 +8,9 @@ package flickrviewer.gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import javax.swing.*;
+import sun.awt.image.SurfaceManager;
 
 /**
  * Hlavní okno programu.
@@ -24,6 +26,11 @@ public class FlickrFrame extends JFrame implements WindowListener, MouseListener
     
     public FlickrFrame() {
         setTitle("Flickr Viewer");
+        
+        java.util.List<Image> icons = new ArrayList<>();
+        icons.add(new ImageIcon(getClass().getClassLoader().getResource("res/icon16.png")).getImage());
+        icons.add(new ImageIcon(getClass().getClassLoader().getResource("res/icon32.png")).getImage());
+        setIconImages(icons);
         
         currentPanel = new UserSelectPanel();
         currentPanel.setFlickrFrame(this);
