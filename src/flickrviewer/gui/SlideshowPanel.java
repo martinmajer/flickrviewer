@@ -37,6 +37,10 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener, MouseLis
     /** Určuje, kolik fotek se bude dopředu načítat. */
     private static final int PRELOAD_COUNT = 3;
     
+    /** Okraje u fotky, pokud není zobrazená na fullscreenu. */
+    private static final int BORDER_SIZE = 40;
+    
+    
     /** Aktuální album. */
     protected PhotoSet set;
     
@@ -411,6 +415,12 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener, MouseLis
     public Dimension getRenderedDimension(Image image, int canvasWidth, int canvasHeight) {
         int imageWidth = image.getWidth(null);
         int imageHeight = image.getHeight(null);
+        
+        // pokud fotka není zobrazená přes celou obrazovku, přidáme pár px okraje
+        if (!flickrFrame.isFullscreen()) {
+            canvasWidth -= BORDER_SIZE*2;
+            canvasHeight -= BORDER_SIZE*2;
+        }
         
         float imageRatio = (float)imageWidth / (float)imageHeight;
         float thisRatio = (float)canvasWidth / (float)canvasHeight;

@@ -77,6 +77,11 @@ public class FlickrFrame extends JFrame implements WindowListener, MouseListener
         repaint();
     }
     
+    /** Vrátí true, pokud je okno zobrazené na celou obrazovku. */
+    public boolean isFullscreen() {
+        return isFullscreen;
+    }
+    
     
     
     private void escapeAction() {
