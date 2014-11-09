@@ -20,6 +20,7 @@ import javax.swing.plaf.metal.*;
 public class ComponentDecorator {
     
     public static final Font FONT = new Font("Arial", Font.PLAIN, 14);
+    public static final Font FONT_SMALL = new Font("Arial", Font.PLAIN, 12);
     // public static final Font FONT_SETS = new Font("Arial", Font.PLAIN, 15);
     
     

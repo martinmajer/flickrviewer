@@ -407,6 +407,19 @@ public class SlideshowPanel extends FlickrPanel implements KeyListener, MouseLis
             
             if (scaledImages.get(photo) != null && scaledImages.get(photo).get() != null) g.drawImage(scaledImages.get(photo).get(), left, top, null);
             else g.drawImage(this.image, left, top, renderedWidth, renderedHeight, null);
+            
+            // zobrazení titulku fotky apod.
+            if (!flickrFrame.isFullscreen()) {
+                g.setColor(Color.GRAY);
+                g.setFont(ComponentDecorator.FONT_SMALL);
+                
+                String count = (currentIndex + 1) + " / " + photos.size();
+                g.drawString(count, BORDER_SIZE, thisHeight - 16);
+                
+                // FontMetrics fm = 
+                int titleWidth = g.getFontMetrics().stringWidth(photos.get(currentIndex).title);
+                g.drawString(photos.get(currentIndex).title, thisWidth - BORDER_SIZE - titleWidth, thisHeight - 16);
+            }
         }
         
     }
